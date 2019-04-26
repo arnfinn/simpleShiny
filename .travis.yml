@@ -3,14 +3,33 @@ sudo: false
 cache: packages
 warnings_are_errors: true
 
-r:
-  - oldrel
-  - release
-  - devel
+matrix:
+  include:
+    - os: linux
+      dist: xenial
+      r: release
+      env: 
+        - DIST=xenial
+        - RUN_LINTR=true
+    - os: osx
+      r: release
+      env: 
+        - DIST=osx
+        - RUN_LINTR=false
 
 env:
   global:
     - _R_CHECK_TESTS_NLINES_=0
+
+r_packages:
+  - geojsonio
+
+before_install:
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      brew update
+      brew install v8
+    fi
 
 script:
   - R CMD build .
